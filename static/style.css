@@ -1,4 +1,4 @@
-/* ----- Backgrounds ----- */
+/* Backgrounds */
 .front-bg-black {
     background-color: #000;
     height: 100vh;
@@ -13,7 +13,7 @@
     color: #fff;
 }
 
-/* ----- Cards & Inputs ----- */
+/* Cards & Inputs */
 .dark-card {
     background-color: #222;
     border-radius: 15px;
@@ -24,7 +24,7 @@
     border: 1px solid #0ff;
 }
 
-/* ----- Neon Text ----- */
+/* Neon Text */
 .neon-text {
     color: #0ff;
     text-shadow:
@@ -34,7 +34,7 @@
        0 0 40px #0ff;
 }
 
-/* ----- Neon Buttons ----- */
+/* Neon Buttons */
 .btn-neon {
     background-color: #000;
     color: #0ff;
@@ -51,7 +51,7 @@
     box-shadow: 0 0 20px #0ff, 0 0 40px #0ff, 0 0 60px #0ff;
 }
 
-/* ----- Neon Card ----- */
+/* Neon Card */
 .neon-card {
     background-color: #222;
     border-left: 4px solid #0ff;
@@ -60,7 +60,7 @@
     box-shadow: 0 0 15px #0ff;
 }
 
-/* ----- Neon Flashing Alert ----- */
+/* Neon Flashing Alert */
 .neon-alert {
     background-color: #000;
     color: #ff073a;

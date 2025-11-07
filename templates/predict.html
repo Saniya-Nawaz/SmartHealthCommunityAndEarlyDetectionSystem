@@ -63,6 +63,9 @@
     <script>
         // ----- Current Reading Bar Chart -----
         const ctx = document.getElementById('waterChart');
+        const phColor = ({{ ph }} < 6.5 || {{ ph }} > 8.5) ? '#ff073a' : '#0ff';
+        const turbidityColor = ({{ turbidity }} > 5) ? '#ff073a' : '#f0f';
+
         new Chart(ctx, {
             type: 'bar',
             data: {
@@ -70,18 +73,25 @@
                 datasets: [{
                     label: 'Water Parameters',
                     data: [{{ ph }}, {{ turbidity }}],
-                    backgroundColor: [
-                        {{ '["#ff073a"]' if ph < 6.5 or ph > 8.5 else '["#0ff"]' }},
-                        {{ '["#ff073a"]' if turbidity > 5 else '["#0ff"]' }}
-                    ]
+                    backgroundColor: [phColor, turbidityColor]
                 }]
             },
-            options: { scales: { y: { beginAtZero: true } } }
+            options: { 
+                scales: { y: { beginAtZero: true } },
+                plugins: {
+                    legend: { labels: { color: '#0ff' } }
+                }
+            }
         });
 
         // ----- History Line Chart -----
         const ctx2 = document.getElementById('historyChart');
         const historyData = {{ history|tojson }};
+
+        // Highlight unsafe points
+        const phColors = historyData.map(x => (x.ph < 6.5 || x.ph > 8.5) ? '#ff073a' : '#0ff');
+        const turbidityColors = historyData.map(x => (x.turbidity > 5) ? '#ff073a' : '#f0f');
+
         new Chart(ctx2, {
             type: 'line',
             data: {
@@ -91,7 +101,8 @@
                         label: 'pH',
                         data: historyData.map(x => x.ph),
                         borderColor: '#0ff',
-                        backgroundColor: '#0ff33',
+                        backgroundColor: phColors,
+                        pointBackgroundColor: phColors,
                         fill: false,
                         tension: 0.3
                     },
@@ -99,18 +110,27 @@
                         label: 'Turbidity',
                         data: historyData.map(x => x.turbidity),
                         borderColor: '#f0f',
-                        backgroundColor: '#f033',
+                        backgroundColor: turbidityColors,
+                        pointBackgroundColor: turbidityColors,
                         fill: false,
                         tension: 0.3
                     }
                 ]
             },
-            options: { scales: { y: { beginAtZero: true } } }
+            options: {
+                scales: { 
+                    y: { beginAtZero: true } 
+                },
+                plugins: {
+                    legend: { labels: { color: '#0ff' } }
+                }
+            }
         });
     </script>
     {% endif %}
 </div>
 </body>
 </html>
+
 
 
