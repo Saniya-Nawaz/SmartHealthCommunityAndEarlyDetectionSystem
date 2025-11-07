@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Water Quality Check</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="dark-bg">
+
+<div class="container pt-5">
+    <h2 class="text-center mb-4 neon-text">💧 Water Quality Checker</h2>
+
+    <!-- Input Form -->
+    <form action="/predict" method="POST" class="card p-4 shadow-lg dark-card">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label text-light">pH Value</label>
+                <input type="number" step="0.01" name="ph" class="form-control dark-input" placeholder="Enter pH (e.g. 7.2)" required>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label text-light">Turbidity (NTU)</label>
+                <input type="number" step="0.01" name="turbidity" class="form-control dark-input" placeholder="Enter Turbidity (e.g. 5)" required>
+            </div>
+        </div>
+        <div class="text-center mt-3">
+            <button class="btn btn-neon">Analyze</button>
+        </div>
+    </form>
+
+    <!-- Alert Banner -->
+    {% if result and result != 'Safe' %}
+    <div id="alertBanner" class="alert-banner neon-alert text-center mt-4">
+        ⚠️ Unsafe Water Detected! Possible Disease: {{ disease }}
+    </div>
+    {% endif %}
+
+    <!-- Result Card -->
+    {% if result %}
+    <div class="card mt-4 p-4 shadow neon-card">
+        <h4 class="text-center neon-text mb-3">Result Summary</h4>
+        <p><strong>Contamination Level:</strong> {{ result }}</p>
+        <p><strong>Possible Disease:</strong> {{ disease }}</p>
+        <p><strong>Prevention:</strong> {{ prevention }}</p>
+
+        {% if symptoms %}
+        <p><strong>Possible Symptoms:</strong></p>
+        <ul>
+            {% for s in symptoms %}
+            <li>{{ s }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        <!-- Current Reading Bar Chart -->
+        <canvas id="waterChart" width="400" height="200"></canvas>
+
+        <!-- History Line Chart -->
+        <canvas id="historyChart" width="400" height="200" class="mt-4"></canvas>
+    </div>
+
+    <script>
+        // ----- Current Reading Bar Chart -----
+        const ctx = document.getElementById('waterChart');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['pH', 'Turbidity'],
+                datasets: [{
+                    label: 'Water Parameters',
+                    data: [{{ ph }}, {{ turbidity }}],
+                    backgroundColor: [
+                        {{ '["#ff073a"]' if ph < 6.5 or ph > 8.5 else '["#0ff"]' }},
+                        {{ '["#ff073a"]' if turbidity > 5 else '["#0ff"]' }}
+                    ]
+                }]
+            },
+            options: { scales: { y: { beginAtZero: true } } }
+        });
+
+        // ----- History Line Chart -----
+        const ctx2 = document.getElementById('historyChart');
+        const historyData = {{ history|tojson }};
+        new Chart(ctx2, {
+            type: 'line',
+            data: {
+                labels: historyData.map((_, i) => 'Reading ' + (i+1)),
+                datasets: [
+                    {
+                        label: 'pH',
+                        data: historyData.map(x => x.ph),
+                        borderColor: '#0ff',
+                        backgroundColor: '#0ff33',
+                        fill: false,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Turbidity',
+                        data: historyData.map(x => x.turbidity),
+                        borderColor: '#f0f',
+                        backgroundColor: '#f033',
+                        fill: false,
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: { scales: { y: { beginAtZero: true } } }
+        });
+    </script>
+    {% endif %}
+</div>
+</body>
+</html>
+
+
